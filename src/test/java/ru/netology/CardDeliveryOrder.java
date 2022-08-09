@@ -4,6 +4,8 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,29 +19,31 @@ public class CardDeliveryOrder {
     public void openForm() {
         open("http://localhost:9999/");
     }
+    public String calendar(int amount){
+        return LocalDate.now().plusDays(amount).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+    }
 
     @Test
     public void successfulSending() {
         Configuration.holdBrowserOpen = true;
-        String meetingDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         $x("//input[@placeholder='Город']").val("Воронеж");
-        $x("//input[@type=\"tel\"]").doubleClick().sendKeys("DEL");
-        $x("//input[@placeholder='Дата встречи']").val(meetingDate);
+        $x("//input[@type=\"tel\"]").doubleClick().sendKeys(Keys.DELETE);
+        $x("//input[@placeholder='Дата встречи']").val(calendar(3));
         $("[data-test-id='name'] input").val("Трухачев Сергей");
         $("[data-test-id='phone'] input").val("+79012345678");
         $("[data-test-id='agreement']").click();
         $x("//*[contains(text(),'Забронировать')]").click();
         $(byText("Успешно!")).shouldBe(Condition.visible, Duration.ofSeconds(15));
-        $("[data-test-id=notification] .notification__content").should(exactText("Встреча успешно забронирована на " + meetingDate));
+        $("[data-test-id=notification] .notification__content").should(exactText("Встреча успешно забронирована на " + calendar(3)));
 
     }
 
     @Test
     void dateCheck() {
         $x("//input[@placeholder=\"Город\"]").val("Москва");
-        $x("//input[@type=\"tel\"]").doubleClick().sendKeys("DELETE");
-        String meetingDate = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        $x("//input[@placeholder=\"Дата встречи\"]").val(meetingDate);
+        $x("//input[@type=\"tel\"]").doubleClick().sendKeys(Keys.DELETE);
+        $x("//input[@placeholder=\"Дата встречи\"]").val(calendar(1));
         $("[data-test-id='name'] input").val("Трухачев Сергей");
         $("[data-test-id='phone'] input").val("+79111734314");
         $("[data-test-id='agreement']").click();
@@ -50,9 +54,8 @@ public class CardDeliveryOrder {
     @Test
     void cityFieldCheck() {
         $x("//input[@placeholder=\"Город\"]").val("Moskva");
-        $x("//input[@type=\"tel\"]").doubleClick().sendKeys("DELETE");
-        String meetingDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        $x("//input[@placeholder=\"Дата встречи\"]").val(meetingDate);
+        $x("//input[@type=\"tel\"]").doubleClick().sendKeys(Keys.DELETE);
+        $x("//input[@placeholder=\"Дата встречи\"]").val(calendar(3));
         $("[data-test-id='name'] input").val("Трухачев Сергей");
         $("[data-test-id='phone'] input").val("+79111734314");
         $("[data-test-id='agreement']").click();
@@ -63,9 +66,8 @@ public class CardDeliveryOrder {
     @Test
     void fieldValidationFirstAndLastName() {
         $x("//input[@placeholder=\"Город\"]").val("Воронеж");
-        $x("//input[@type=\"tel\"]").doubleClick().sendKeys("DELETE");
-        String meetingDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        $x("//input[@placeholder=\"Дата встречи\"]").val(meetingDate);
+        $x("//input[@type=\"tel\"]").doubleClick().sendKeys(Keys.DELETE);
+        $x("//input[@placeholder=\"Дата встречи\"]").val(calendar(3));
         $("[data-test-id='name'] input").val("Sergey Trukhachev");
         $("[data-test-id='phone'] input").val("+79111734314");
         $("[data-test-id='agreement']").click();
@@ -75,9 +77,8 @@ public class CardDeliveryOrder {
     @Test
     void phoneFieldCheck() {
         $x("//input[@placeholder=\"Город\"]").val("Воронеж");
-        $x("//input[@type=\"tel\"]").doubleClick().sendKeys("DELETE");
-        String meetingDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        $x("//input[@placeholder=\"Дата встречи\"]").val(meetingDate);
+        $x("//input[@type=\"tel\"]").doubleClick().sendKeys(Keys.DELETE);
+        $x("//input[@placeholder=\"Дата встречи\"]").val(calendar(3));
         $("[data-test-id='name'] input").val("Трухачев Сергей");
         $("[data-test-id='phone'] input").val("+79111");
         $("[data-test-id='agreement']").click();
@@ -88,12 +89,10 @@ public class CardDeliveryOrder {
     @Test
     void checkboxValidation() {
         $x("//input[@placeholder=\"Город\"]").val("Воронеж");
-        $x("//input[@type=\"tel\"]").doubleClick().sendKeys("DELETE");
-        String meetingDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        $x("//input[@placeholder=\"Дата встречи\"]").val(meetingDate);
+        $x("//input[@type=\"tel\"]").doubleClick().sendKeys(Keys.DELETE);
+        $x("//input[@placeholder=\"Дата встречи\"]").val(calendar(3));
         $("[data-test-id='name'] input").val("Трухачев Сергей");
         $("[data-test-id='phone'] input").val("+79111734314");
-        //$("[data-test-id='agreement']").click();
         $x("//*[contains(text(),'Забронировать')]").click();
         $("[data-test-id='agreement'].input_invalid").should(exactText("Я соглашаюсь с условиями обработки и использования моих персональных данных"));
     }
